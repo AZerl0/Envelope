@@ -1,59 +1,66 @@
 # Changelog
 
-## UNRELEASED
-- Added dedicated creative-mode tab for Envelope items
-- Slightly increased Pigeon's mailbox mail pickup range
-- Fixed Mailbox block not breaking properly if it has mail inside  
-- Book and Quill and Letter and Quill mailing recipes no longer require a Slimeball
-- Increased courier ascend distance from 16 to 24 blocks (position above the mailbox where it disappears)
+## 0.8.0-Snapshot1
+### New features
+Seal
+- Added **16** colors of **seals** and **Seal Stamps** to apply them
+- Added **Gold** seal material for Patreon supporters
+- Added Seal Stamp with `cube` die recipe to **Mail Service** - requires a **Grass Block**
+- Added `skull_and_bones` symbol
 
+Misc
+- Added dedicated creative-mode tab for Envelope items
+- Added **Cloud Depository** service address:
+  - Remote storage that accepts and stores sealed items until a **Withdrawal Request** is sent to it
+- Added **Letter Presetting**:
+  - Crafting a **Letter and Quill** with specific items will create a Letter with "**meaning**" that various systems can understand and respond to
+- Added original recipient to the delivered mail tooltip (To: [address])
+
+JEI
+- Added information about service addresses and some other items
+- Added information to a couple of mailing recipes
+- Address in mailing recipes is now clickable and will show usages when clicked
+- Updated how service address ingredient renders
+
+### Changes and fixes
+Seal
+- Changed sealing sound
+- Changed **Seal Stamp** recipe to require a **Honeycomb** and any wooden planks, instead of two wooden slabs
+- Redesigned or refreshed all seal symbol textures
+- Changed seal symbols:
+  - `letter` -> `letter_and_quill`
+  - `block` -> `cube`
+- Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
+- Default die (first letter of player name) will now show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example)
+
+Misc
+- Slightly increased courier mailbox mail pickup range
+- Increased courier ascend distance from 16 to 24 blocks (position above the mailbox where it disappears)
+- **Book and Quill** and **Letter and Quill** mailing recipes no longer require a **Slimeball**
+- Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior
+- Fixed **Mailbox** block not breaking properly if it has mail inside
+- Fixed mail not delivering to the player address in some cases when letter casing in address definition didn't match player name exactly
+- Fixed crashing with recent JEI versions (above 19.52.0.421)
+
+### Technical Changes
 Config
 - Added `delivery.phase_duration_modifier` and `delivery.ascend_distance` options to server config
 - Added `hide_default_seal_stamp_die_outside_of_inventory` option to client config
 
-- Added Cloud Depository:
-  - Remote storage that accepts and stores sealed items until a Withdrawal Request is sent to it
-- Added Letter Presetting:
-  - Crafting a Letter and Quill with specific items will create a Letter with "meaning" that various systems can understand and respond to
-
-JEI
-- Added information about service addresses and some other items
-- Added information to a couple of mailing recipes 
-- Address in mailing recipes is now clickable and will show usages when clicked
-- Updated how service address ingredient renders
-
-Wax Seals
-- Added 16 colors of seals and Seal Stamps to apply them
-- Added *Gold* seal material for Patreon supporters
-- Changed sealing sound
-- Changed Seal Stamp recipe to require a Honeycomb and any wooden planks, instead of two wooden slabs
-- Added `cube` Seal Stamp mailing recipe - requires a **Grass Block**
-- Redesigned or refreshed all seal symbol textures 
-- Added seal symbols:
-  - `skull_and_bones`
-- Changed seal symbols: 
-  - `letter` -> `letter_and_quill`
-  - `block` -> `cube`
-- Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
-- Default die (first letter of player name) will now show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example) 
+Item components:
 - Added `player_uuid` to the `envelope:seal` item component.
+- `envelope:address` has been replaced with `envelope:address_tag_address`
+- `envelope:mail_recipient` has been replaced with `envelope:mail_address_tag`
+- `envelope:mail_payback_request` has been replaced with `envelope:mail_payback_tag`
+- `envelope:mail_sender`, `envelope:mail_delivery_log` and `envelope:mail_returned` have been replaced with a single `envelope:mail_delivery_info` component
+- `envelope:mail_id` has been removed
 
-
-- Added original recipient to the delivered mail tooltip (To: <address>)
-- Item components:
-  - `envelope:address` has been replaced with `envelope:address_tag_address`
-  - `envelope:mail_recipient` has been replaced with `envelope:mail_address_tag`
-  - `envelope:mail_payback_request` has been replaced with `envelope:mail_payback_tag`
-  - `envelope:mail_sender`, `envelope:mail_delivery_log` and `envelope:mail_returned` have been replaced with a single `envelope:mail_delivery_info` component
-  - `envelope:mail_id` has been removed
+Misc
 - Added `/envelope broadcast` command
 - `/envelope send` command now fails when recipient is not found
-- Fixed mail not delivering to the player address in some cases when letter casing in address definition didn't match player name exactly    
-- Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior
 - Bundled Mortaar library with the mod
   - Mortaar is a library mod that will be used to aid in mod development and reduce code duplication
   - As a player, you will not see any difference, apart from an additional mod in the mod menu
-- Fixed crashing with recent JEI versions (above 19.52.0.421)
 
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))
