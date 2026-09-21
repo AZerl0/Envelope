@@ -15,6 +15,7 @@ import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.payback.PaybackDepartment;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import io.github.mortuusars.envelope.world.KnownPlayers;
+import io.github.mortuusars.mortaar.resources.Resource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
@@ -205,7 +206,7 @@ public class MailService {
     }
 
     public ServiceAddress getAddress() {
-        return ServiceAddress.getOrThrow(getLevel().registryAccess(), ServiceAddress.MAIL_SERVICE);
+        return ServiceAddress.getOrThrow(ServiceAddress.MAIL_SERVICE, getLevel().registryAccess());
     }
 
     /**

@@ -1,11 +1,11 @@
 package io.github.mortuusars.envelope.util.bugger;
 
-import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.mortaar.bugger.screen.BuggerEntityOverhead;
+import io.github.mortuusars.mortaar.util.GameTime;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;

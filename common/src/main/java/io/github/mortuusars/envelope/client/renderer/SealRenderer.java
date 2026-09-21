@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.client.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.mortaar.util.color.TintColor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -53,9 +54,20 @@ public class SealRenderer {
 
         if (material.hasGlint()) {
             RenderSystem.enableBlend();
-            guiGraphics.blitSprite(Envelope.resource("seal_glint"), 32, 32, 0, 0, x, y, 32, 32);
+            guiGraphics.blitSprite(SEAL_GLINT_SPRITE, 32, 32, 0, 0, x, y, 32, 32);
             RenderSystem.disableBlend();
         }
+
+        seal.lock().ifPresent(lock -> {
+            if (lock.isLocked(Minecrft.level())) {
+                RenderSystem.enableBlend();
+                guiGraphics.blitSprite(Envelope.resource("seal_locked_overlay"), 34, 34,
+                      0, 0, x - 2, y - 2, 34, 34);
+                RenderSystem.disableBlend();
+                guiGraphics.blitSprite(Envelope.resource("seal_lock"), 34, 34,
+                      0, 0, x - 2, y - 2, 34, 34);
+            }
+        });
     }
 
     public void renderDie(SealSymbol impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {

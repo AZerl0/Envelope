@@ -1,5 +1,6 @@
-package io.github.mortuusars.envelope.util.bugger.cases;
+package io.github.mortuusars.envelope.test.cases;
 
+import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
 import io.github.mortuusars.mortaar.bugger.test.Test;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeInput;
@@ -17,12 +18,9 @@ import java.util.Arrays;
 
 public class MailCraftingTests extends BuggerTests {
     public static final int RECIPE_EXPERIENCE = 3;
-    private final MinecraftServer server;
 
-    public MailCraftingTests(MinecraftServer server) {
-        this.server = server;
-
-        add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(() -> {
+    public MailCraftingTests() {
+        add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(player -> {
             Mailing.Result result = Mailing.craft(
                   recipe(
                         Ingredient.of(Items.EMERALD),
@@ -38,7 +36,7 @@ public class MailCraftingTests extends BuggerTests {
             return result.input().isEmpty() && result.output().size() == 1 && result.output().getFirst().getCount() == 6;
         }));
 
-        add("MailCrafting_CraftsWithRemainder", Test.isTrue(() -> {
+        add("MailCrafting_CraftsWithRemainder", Test.isTrue(player -> {
             Mailing.Result result = Mailing.craft(
                   recipe(
                         Ingredient.of(Items.EMERALD),
@@ -56,7 +54,7 @@ public class MailCraftingTests extends BuggerTests {
                   && result.output().size() == 1;
         }));
 
-        add("MailCrafting_CraftingReturnsCorrectTotalExperience", Test.isTrue(() -> {
+        add("MailCrafting_CraftingReturnsCorrectTotalExperience", Test.isTrue(player -> {
             Mailing.Result result = Mailing.craft(
                   recipe(
                         Ingredient.of(Items.EMERALD),
@@ -72,7 +70,7 @@ public class MailCraftingTests extends BuggerTests {
             return result.input().isEmpty() && result.experience() == RECIPE_EXPERIENCE * 3;
         }));
 
-        add("MailCrafting_ConsumesCorrectly", Test.isTrue(() -> {
+        add("MailCrafting_ConsumesCorrectly", Test.isTrue(player -> {
             MailCraftingRecipe recipe = recipe(
                   Ingredient.of(Items.EMERALD),
                   Ingredient.of(Items.DIAMOND)
@@ -88,7 +86,7 @@ public class MailCraftingTests extends BuggerTests {
             return input.isEmpty();
         }));
 
-        add("MailCrafting_ConsumesAndReturnsRemainder", Test.isTrue(() -> {
+        add("MailCrafting_ConsumesAndReturnsRemainder", Test.isTrue(player -> {
             MailCraftingRecipe recipe = recipe(
                   Ingredient.of(Items.EMERALD),
                   Ingredient.of(Items.DIAMOND)
@@ -109,7 +107,7 @@ public class MailCraftingTests extends BuggerTests {
                   .orElse(false);
         }));
 
-        add("MailCrafting_ConsumesOnlyForOneOperation", Test.isTrue(() -> {
+        add("MailCrafting_ConsumesOnlyForOneOperation", Test.isTrue(player -> {
             MailCraftingRecipe recipe = recipe(
                   Ingredient.of(Items.EMERALD),
                   Ingredient.of(Items.DIAMOND)
@@ -130,13 +128,13 @@ public class MailCraftingTests extends BuggerTests {
 
     private MailCraftingRecipe recipe(Ingredient... ingredients) {
         return new MailCraftingRecipe(
-              MailService.of(server.overworld()).getAddress(),
+              MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress(),
               NonNullList.of(Ingredient.EMPTY, ingredients),
               new ItemStack(Items.BARRIER),
               RECIPE_EXPERIENCE);
     }
 
     private MailRecipeInput input(ItemStack... items) {
-        return new MailRecipeInput(server.overworld().getEnvelopeMailService(), Address.UNKNOWN, Arrays.stream(items).toList());
+        return new MailRecipeInput(Platform.getCurrentServerOrThrow().overworld().getEnvelopeMailService(), Address.UNKNOWN, Arrays.stream(items).toList());
     }
 }

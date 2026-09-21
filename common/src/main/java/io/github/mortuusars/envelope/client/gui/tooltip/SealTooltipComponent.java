@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -25,7 +26,9 @@ public class SealTooltipComponent implements ClientTooltipComponent {
 
     @Override
     public int getHeight() {
-        return 32;
+        return seal.lock()
+              .map(lock -> lock.isLocked(Minecrft.level()) ? 33 : 32) // +1 pixel to make some room for lock tentacles
+              .orElse(32);
     }
 
     @Override

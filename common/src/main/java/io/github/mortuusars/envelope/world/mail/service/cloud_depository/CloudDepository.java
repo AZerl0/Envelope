@@ -59,7 +59,7 @@ public class CloudDepository {
 
     public CloudDepository(MailService service) {
         this.service = service;
-        this.address = ServiceAddress.getOrThrow(service.getLevel().registryAccess(), ServiceAddress.CLOUD_DEPOSITORY);
+        this.address = ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, service.getLevel().registryAccess());
         this.seal = createSeal(service.getLevel().registryAccess());
     }
 
@@ -249,11 +249,11 @@ public class CloudDepository {
     // --
 
     public static @NotNull Seal createSeal(RegistryAccess registryAccess) {
-        return Seal.createForNpc(
-              SealMaterial.getOrThrow(registryAccess, SealMaterial.WAX),
-              SealSymbol.getOrThrow(registryAccess, SealSymbol.CLOUD_DEPOSITORY),
-              Component.translatable("address.envelope.cloud_depository")
-        );
+        return Seal.create(registryAccess)
+              .material(SealMaterial.WAX)
+              .impression(SealSymbol.CLOUD_DEPOSITORY)
+              .signature(Component.translatable("address.envelope.cloud_depository"))
+              .build();
     }
 
     public static ItemStack createDepositReportLetter(Seal seal, ItemStack depositedItem, int accountStorageCurrent, int accountStorageCapacity) {

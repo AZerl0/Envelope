@@ -58,7 +58,6 @@ public class DeliveryDraft {
 
     // --
 
-
     public @NotNull Id getOrCreateId(Level level) {
         return id != null ? id : Id.create(level);
     }

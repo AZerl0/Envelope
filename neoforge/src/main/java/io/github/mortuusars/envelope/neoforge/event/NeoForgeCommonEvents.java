@@ -92,4 +92,11 @@ public class NeoForgeCommonEvents {
     public static void entityDeath(LivingDeathEvent event) {
         CommonEvents.livingDeath(event.getEntity(), event.getSource());
     }
+
+    @SubscribeEvent
+    public static void copyPlayer(PlayerEvent.Clone event) {
+        if (event.getOriginal() instanceof ServerPlayer oldPlayer && event.getEntity() instanceof ServerPlayer newPlayer) {
+            ServerEvents.playerCopy(oldPlayer, newPlayer, !event.isWasDeath());
+        }
+    }
 }

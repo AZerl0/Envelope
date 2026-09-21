@@ -48,12 +48,11 @@ public class SealedPackageItem extends PackageItem implements SealedItem {
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        player.startUsingItem(hand);
-        return InteractionResultHolder.success(player.getItemInHand(hand));
+        return useSealedItem(level, player, hand);
     }
 
     @Override
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        return unseal(stack, level, entity);
+        return unsealByUsing(stack, level, entity);
     }
 }

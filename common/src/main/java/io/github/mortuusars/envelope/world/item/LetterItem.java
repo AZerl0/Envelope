@@ -24,8 +24,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -35,15 +33,11 @@ public class LetterItem extends BlockItem implements SealableItem {
         super(block, properties);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (stack.get(Envelope.DataComponents.LETTER_MEANING) instanceof ResourceLocation meaning) {
-            tooltipComponents.add(Component.translatable(meaning.toLanguageKey("letter_meaning").replace("/", ".")).withStyle(ChatFormatting.GRAY));
-//            tooltipComponents.add(Component.translatableWithFallback(
-//                        meaning.toLanguageKey("letter_meaning"),
-//                        WordUtils.capitalize(meaning.getPath().replace("/", ": ").replace("_", " ")))
-//                  );
+            tooltipComponents.add(Component.translatable(meaning.toLanguageKey("letter_meaning")
+                  .replace("/", ".")).withStyle(ChatFormatting.GRAY));
         }
     }
 

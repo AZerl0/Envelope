@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import io.github.mortuusars.mortaar.resources.Resource;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -111,19 +112,11 @@ public final class ServiceAddress implements Address {
 
     // --
 
-    public static ServiceAddress getOrThrow(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
-        return new ServiceAddress(getHolderOrThrow(registries, key));
+    public static ServiceAddress getOrThrow(ResourceKey<ServiceAddressDefinition> key, HolderLookup.Provider registries) {
+        return new ServiceAddress(Resource.getOrThrow(key, registries));
     }
 
-    public static Optional<ServiceAddress> get(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
-        return getHolder(registries, key).map(ServiceAddress::new);
-    }
-
-    public static Holder.Reference<ServiceAddressDefinition> getHolderOrThrow(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).getOrThrow(key);
-    }
-
-    public static Optional<Holder.Reference<ServiceAddressDefinition>> getHolder(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).get(key);
+    public static Optional<ServiceAddress> get(ResourceKey<ServiceAddressDefinition> key, HolderLookup.Provider registries) {
+        return Resource.get(key, registries).map(ServiceAddress::new);
     }
 }

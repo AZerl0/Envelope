@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
+import io.github.mortuusars.mortaar.resources.Resource;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -28,7 +29,7 @@ public class SealDieTooltipComponent implements ClientTooltipComponent {
               .flatMap(eitherHolder -> eitherHolder.unwrap(Minecrft.registryAccess()))
               .orElseGet(() -> {
                   ResourceKey<SealSymbol> key = SealSymbol.firstCharOrDefault(Minecrft.player());
-                  return SealSymbol.getOrThrow(Minecrft.registryAccess(), key);
+                  return Resource.getOrThrow(key, Minecrft.registryAccess());
               })
               .value();
     }

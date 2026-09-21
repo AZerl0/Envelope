@@ -6,8 +6,14 @@ import io.github.mortuusars.envelope.world.block.dispenser.PlaceBlockDispenseIte
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.SealStampItem;
+import io.github.mortuusars.envelope.world.item.component.SealLock;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -17,13 +23,20 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class CommonEvents {
     public static void commonSetup() {
@@ -72,7 +85,7 @@ public class CommonEvents {
               && entity.getType().is(Envelope.Tags.EntityTypes.SPAWNS_ARCHIMEDES)
               && source.is(Envelope.Tags.DamageTypes.SPAWNS_ARCHIMEDES)
               && player.serverLevel().getEntitiesOfClass(
-                    Pigeon.class, new AABB(entity.blockPosition()).inflate(48, 32, 48)).size() < 8) {
+              Pigeon.class, new AABB(entity.blockPosition()).inflate(48, 32, 48)).size() < 8) {
             @Nullable Pigeon pigeon = Envelope.EntityTypes.PIGEON.get().spawn(player.serverLevel(), entity.blockPosition(), MobSpawnType.TRIGGERED);
             if (pigeon == null) {
                 Envelope.LOGGER.warn("Cannot spawn Archimedes :(");
@@ -88,5 +101,14 @@ public class CommonEvents {
 
             Envelope.CriteriaTriggers.SPAWN_ARCHIMEDES.get().trigger(player);
         }
+    }
+
+    public static Optional<TooltipComponent> modifyTooltipImage(Optional<TooltipComponent> original, ItemStack stack) {
+        return Mail.modifyTooltipImage(stack, original);
+    }
+
+    public static void appendTooltipLines(ItemStack stack, Item.TooltipContext tooltipContext, @Nullable Player player,
+                                          TooltipFlag tooltipFlag, Consumer<Component> consumer) {
+        Mail.appendTooltipLines(stack, consumer, tooltipContext, player, tooltipFlag);
     }
 }

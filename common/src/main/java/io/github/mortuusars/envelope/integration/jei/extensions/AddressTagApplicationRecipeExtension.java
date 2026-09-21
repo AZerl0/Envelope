@@ -25,7 +25,7 @@ public class AddressTagApplicationRecipeExtension implements ICraftingCategoryEx
               .orElse(List.of());
 
         ItemStack tag = new ItemStack(Envelope.Items.ADDRESS_TAG.get());
-        tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.MAIL_SERVICE));
+        tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, ServiceAddress.getOrThrow(ServiceAddress.MAIL_SERVICE, Minecrft.registryAccess()));
         List<ItemStack> tagItems = List.of(tag);
 
         List<ItemStack> resultItems = mailableItems.stream()

@@ -106,7 +106,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
             ));
 
             registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
-                  ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.CLOUD_DEPOSITORY)));
+                  ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, Minecrft.registryAccess())));
         }
     }
 
@@ -136,12 +136,12 @@ public class EnvelopeJeiPlugin implements IModPlugin {
             return;
         }
 
-        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(ServiceAddress.MAIL_SERVICE, Minecrft.registryAccess()), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.mail_service"));
-        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(ServiceAddress.AUTOMATED_SUPPLY_SERVICE, Minecrft.registryAccess()), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.automated_supply_service"));
 
-        ServiceAddress cloudDepository = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.CLOUD_DEPOSITORY);
+        ServiceAddress cloudDepository = ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, Minecrft.registryAccess());
         if (ServiceAddress.isEnabled(cloudDepository)) {
             MutableComponent cloudDepositoryAddress = cloudDepository.format()
                   .withIcon()

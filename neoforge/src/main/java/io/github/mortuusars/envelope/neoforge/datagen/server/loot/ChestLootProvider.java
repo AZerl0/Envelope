@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
+import io.github.mortuusars.mortaar.resources.Resource;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.loot.LootTableSubProvider;
@@ -56,7 +57,7 @@ public class ChestLootProvider implements LootTableSubProvider {
               )
         );
 
-        MutableComponent automatedSupplyService = ServiceAddress.getOrThrow(registries, ServiceAddress.AUTOMATED_SUPPLY_SERVICE).format().toComponent();
+        MutableComponent automatedSupplyService = ServiceAddress.getOrThrow(ServiceAddress.AUTOMATED_SUPPLY_SERVICE, registries).format().toComponent();
 
         output.accept(
               Envelope.LootTables.COLLAPSED_MAIL_HUB_STORAGE_MAIL,
@@ -111,15 +112,15 @@ public class ChestLootProvider implements LootTableSubProvider {
                     .add(LootItem.lootTableItem(Items.PAPER).setWeight(1).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 6.0F))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get()).setWeight(2).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.HEART)))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(Resource.getOrThrow(SealSymbol.HEART, registries)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.CREEPER)))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(Resource.getOrThrow(SealSymbol.CREEPER, registries)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.LETTER_AND_QUILL)))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(Resource.getOrThrow(SealSymbol.LETTER_AND_QUILL, registries)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.SWORDS)))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(Resource.getOrThrow(SealSymbol.SWORDS, registries)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.VILLAGER)))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(Resource.getOrThrow(SealSymbol.VILLAGER, registries)))))
               )
         );
 

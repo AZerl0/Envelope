@@ -13,6 +13,7 @@ import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
 import io.github.mortuusars.envelope.network.packet.clientbound.*;
 import io.github.mortuusars.envelope.network.packet.serverbound.*;
+import io.github.mortuusars.envelope.test.cases.EnvelopeBuggerTests;
 import io.github.mortuusars.envelope.util.bugger.data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
@@ -47,6 +48,7 @@ import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDe
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import io.github.mortuusars.mortaar.Register;
 import io.github.mortuusars.mortaar.Registrar;
+import io.github.mortuusars.mortaar.bugger.Bugger;
 import io.github.mortuusars.mortaar.bugger.data.EntityData;
 import io.github.mortuusars.mortaar.bugger.data.OptionalEntityData;
 import io.github.mortuusars.mortaar.util.DeferredSoundType;
@@ -137,12 +139,15 @@ public class Envelope {
         Register.clientboundPacket(ClientboundOpenAddressTagScreenPacket.TYPE, ClientboundOpenAddressTagScreenPacket.STREAM_CODEC);
         Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
         Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundSyncDeathLockDataPacket.TYPE, ClientboundSyncDeathLockDataPacket.STREAM_CODEC);
 
         ServiceDropOffHandlerRegistry.register(ServiceAddress.CLOUD_DEPOSITORY, CloudDepository::handleDropOff);
 
         if (Mods.EVERY_COMPAT.isLoaded()) {
             EveryCompatIntegration.init();
         }
+
+        Bugger.addTests(EnvelopeBuggerTests::create);
     }
 
     /**
@@ -355,6 +360,8 @@ public class Envelope {
         public static final Supplier<SealStampItem> PURPLE_SEAL_STAMP = dyedStamp(DyeColor.PURPLE);
         public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = dyedStamp(DyeColor.MAGENTA);
         public static final Supplier<SealStampItem> PINK_SEAL_STAMP = dyedStamp(DyeColor.PINK);
+        public static final Supplier<DeathSealStampItem> DEATH_SEAL_STAMP = REGISTRAR.item("death_seal_stamp",
+              () -> new DeathSealStampItem(stampProperties(SealMaterial.SCULK)));
 
         private static Supplier<SealStampItem> dyedStamp(DyeColor color) {
             @Nullable ResourceKey<SealMaterial> materialKey = SealMaterial.fromDyeColor(color);
@@ -390,24 +397,25 @@ public class Envelope {
                     .title(Component.translatable("item_group.envelope.envelope"))
                     .icon(() -> new ItemStack(Items.LETTER.get()))
                     .displayItems((params, output) -> {
-                        Envelope.Items.PIGEONHOLES.forEach(item -> output.accept(item.get()));
-                        output.accept(Envelope.Items.MAILBOX.get());
-                        output.accept(Envelope.Items.ADDRESS_TAG.get());
-                        output.accept(Envelope.Items.PAYBACK_TAG.get());
+                        Items.PIGEONHOLES.forEach(item -> output.accept(item.get()));
+                        output.accept(Items.MAILBOX.get());
+                        output.accept(Items.ADDRESS_TAG.get());
+                        output.accept(Items.PAYBACK_TAG.get());
 
-                        output.accept(Envelope.Items.LETTER_AND_QUILL.get());
-                        output.accept(Envelope.Items.LETTER.get());
-                        output.accept(Envelope.Items.SEALED_LETTER.get());
+                        output.accept(Items.LETTER_AND_QUILL.get());
+                        output.accept(Items.LETTER.get());
+                        output.accept(Items.SEALED_LETTER.get());
 
-                        output.accept(Envelope.Items.PAPER_BOX.get());
-                        output.accept(Envelope.Items.PACKAGE.get());
-                        output.accept(Envelope.Items.SEALED_PACKAGE.get());
+                        output.accept(Items.PAPER_BOX.get());
+                        output.accept(Items.PACKAGE.get());
+                        output.accept(Items.SEALED_PACKAGE.get());
 
-                        output.accept(Envelope.Items.SEAL_STAMP.get());
-                        Envelope.Items.DYED_SEAL_STAMPS.values().forEach(stamp -> output.accept(stamp.get()));
+                        output.accept(Items.SEAL_STAMP.get());
+                        Items.DYED_SEAL_STAMPS.values().forEach(stamp -> output.accept(stamp.get()));
+                        output.accept(Items.DEATH_SEAL_STAMP.get());
 
-                        output.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
-                        output.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
+                        output.accept(Items.PIGEON_SPAWN_EGG.get());
+                        output.accept(Items.CHARRED_PIGEON_SPAWN_EGG.get());
                     })
                     .build());
 
@@ -456,6 +464,8 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = REGISTRAR.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
+//        public static final DataComponentType<SealLock> SEAL_DEATH_LOCK = REGISTRAR.dataComponentType("seal_death_lock",
+//              b -> b.persistent(SealLock.CODEC).networkSynchronized(SealLock.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<EitherHolder<SealMaterial>> SEAL_STAMP_MATERIAL = REGISTRAR.dataComponentType("seal_stamp_material",
               b -> b.persistent(EitherHolder.codec(Registries.SEAL_MATERIAL, SealMaterial.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_MATERIAL, SealMaterial.STREAM_CODEC)).cacheEncoding());
         public static final DataComponentType<EitherHolder<SealSymbol>> SEAL_STAMP_DIE = REGISTRAR.dataComponentType("seal_stamp_die",
@@ -469,7 +479,8 @@ public class Envelope {
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC).cacheEncoding());
 
         // -- Misc
-
+//        public static final DataComponentType<Unit> KEPT_ON_DEATH = REGISTRAR.dataComponentType("kept_on_death",
+//              b -> b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
         public static final DataComponentType<List<Occupant>> PIGEONS = REGISTRAR.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
 

@@ -1,16 +1,28 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.mortaar.client.Minecrft;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface SealedItem {
@@ -25,15 +37,42 @@ public interface SealedItem {
     }
 
     default int getUnsealingDuration(ItemStack stack, LivingEntity entity) {
-        return 20;
+        return 20; //TODO: config
     }
 
-    default ItemStack unseal(ItemStack stack, Level level, @Nullable LivingEntity entity) {
+    default boolean canRemoveSeal(ItemStack stack, Player player) {
+        if (stack.get(Envelope.DataComponents.SEAL) instanceof Seal seal) {
+            return seal.lock().map(lock -> !lock.isLockedFor(player)).orElse(true);
+        }
+
+        return true;
+    }
+
+    default @NotNull InteractionResultHolder<ItemStack> useSealedItem(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!canRemoveSeal(stack, player)) {
+            player.displayClientMessage(Component.translatable("gui.envelope.sealed_item.locked").withStyle(ChatFormatting.RED), true);
+            player.playSound(SoundEvents.SCULK_BLOCK_CHARGE);
+            return InteractionResultHolder.fail(stack);
+        }
+
+        player.startUsingItem(hand);
+        return InteractionResultHolder.success(stack);
+    }
+
+    default ItemStack unsealByUsing(ItemStack stack, Level level, @Nullable LivingEntity entity) {
+        if (entity instanceof Player player && !canRemoveSeal(stack, player)) {
+            return stack;
+        }
+
+        ItemStack unsealedStack = unseal(stack);
+        onUnsealed(stack, unsealedStack, level, entity);
+        return unsealedStack;
+    }
+
+    default ItemStack unseal(ItemStack stack) {
         ItemStack unsealedStack = stack.transmuteCopy(getUnsealedItem());
         unsealedStack.remove(Envelope.DataComponents.SEAL);
-
-        onUnsealed(stack, unsealedStack, level, entity);
-
         return unsealedStack;
     }
 
@@ -53,5 +92,48 @@ public interface SealedItem {
         if (entity instanceof ServerPlayer serverPlayer) {
             serverPlayer.awardStat(Envelope.Stats.SEALS_BROKEN.get());
         }
+    }
+
+    // --
+
+    int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF158292;
+
+    static int getSealOverlayColor(ItemStack stack, int layer) {
+        if (layer != 1) {
+            return -1;
+        }
+
+        @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
+        if (seal != null) {
+            int materialColor = seal.material().value().modelTintColor();
+            return seal.lock()
+                  .map(lock -> {
+                      if (lock.isLocked(Minecrft.level())) {
+                          float time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true))
+                                * 3f % 179f;
+                          return FastColor.ARGB32.lerp(Mth.sin((float)Math.toRadians(time)), materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
+                      } else {
+                          return materialColor;
+                      }
+                  })
+                  .orElse(materialColor);
+        }
+
+        return 0xFFCC4E47; // Default red color
+    }
+
+    static int getSealOverlayColor(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int index) {
+        if (index != 0) {
+            return -1;
+        }
+
+        if (level != null && pos != null && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
+            @Nullable Seal seal = blockEntity.getPackage().get(Envelope.DataComponents.SEAL);
+            if (seal != null) {
+                return seal.material().value().modelTintColor();
+            }
+        }
+
+        return 0xFFCC4E47; // Default red color
     }
 }

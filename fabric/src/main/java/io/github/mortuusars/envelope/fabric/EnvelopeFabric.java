@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -88,6 +89,8 @@ public class EnvelopeFabric implements ModInitializer {
         });
 
         ServerLivingEntityEvents.AFTER_DEATH.register(CommonEvents::livingDeath);
+
+        ServerPlayerEvents.COPY_FROM.register(ServerEvents::playerCopy);
 
         LootTableEvents.MODIFY.register(EnvelopeFabric::modifyLoot);
     }

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger.cases;
+package io.github.mortuusars.envelope.test.cases;
 
 import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
@@ -10,20 +10,21 @@ import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class CourierDeliveryTests extends BuggerTests {
-    private final MinecraftServer server;
-
-    public CourierDeliveryTests(MinecraftServer server) {
-        this.server = server;
+    public CourierDeliveryTests() {
         add(new Test("TickDelivery_CallsCallbacksProperly", this::testCallbacks));
     }
 
-    private DataResult<Boolean> testCallbacks() {
+    private DataResult<Boolean> testCallbacks(ServerPlayer player) {
+        MinecraftServer server = player.getServer();
+        assert server != null;
+
         Delivery delivery = new Delivery(
               Id.createUnsafe(0),
               Optional.empty(),

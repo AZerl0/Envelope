@@ -1,18 +1,23 @@
 package io.github.mortuusars.envelope.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.LongArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.mortuusars.envelope.Envelope;
+import com.mojang.serialization.JsonOps;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.util.Colors;
+import io.github.mortuusars.envelope.world.item.component.SealLock;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
+import io.github.mortuusars.mortaar.command.argument.GameTimeIdArgument;
+import io.github.mortuusars.mortaar.util.GameTimeId;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -56,6 +61,25 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.block())
                                 .suggests(AddressSuggestions.block())
                                 .executes(c -> mailboxPosition(c, AddressArgument.getBlock(c, "address"))))))
+              .then(Commands.literal("seal_locks")
+                    .then(Commands.literal("create")
+                          .then(Commands.argument("owner", StringArgumentType.word())
+                                .executes(c -> createSealLock(c,
+                                      StringArgumentType.getString(c, "owner"),
+                                      Optional.empty()))
+                                .then(Commands.argument("id", GameTimeIdArgument.id())
+                                      .executes(c -> createSealLock(c,
+                                            StringArgumentType.getString(c, "owner"),
+                                            Optional.of(GameTimeIdArgument.getId(c, "id")))))))
+                    .then(Commands.literal("unlock")
+                          .then(Commands.argument("owner", StringArgumentType.word())
+                                .executes(c -> unlockSealLock(c,
+                                      StringArgumentType.getString(c, "owner"),
+                                      Optional.empty()))
+                                .then(Commands.argument("id", LongArgumentType.longArg(1))
+                                      .executes(c -> unlockSealLock(c,
+                                            StringArgumentType.getString(c, "owner"),
+                                            Optional.of(GameTimeIdArgument.getId(c, "id"))))))))
               .then(EnvelopeDebugCommand.commands()));
     }
 
@@ -202,5 +226,58 @@ public class EnvelopeCommand {
                           .append("\n")
                           .append(Component.literal(posToCopy).withStyle(ChatFormatting.GRAY))))
                     .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, posToCopy))));
+    }
+
+    // -- Seal Locks
+
+    private static int createSealLock(CommandContext<CommandSourceStack> context, String owner, Optional<GameTimeId> id) {
+        if (owner.isBlank()) {
+            context.getSource().sendFailure(Component.literal("Lock owner cannot be empty."));
+            return 0;
+        }
+
+        ServerLevel level = context.getSource().getLevel();
+        SealLock lock = new SealLock(owner, id.orElseGet(() -> GameTimeId.create(level)));
+        lock.lock(level);
+
+        context.getSource().sendSuccess(() -> {
+            String serialized = SealLock.CODEC.encodeStart(level.registryAccess().createSerializationContext(JsonOps.INSTANCE), lock)
+                  .getOrThrow()
+                  .toString()
+                  .replace("\"", "");
+
+            return Component.literal("Lock created: ").append(Component.literal(serialized)
+                  .withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)
+                        .withUnderlined(true)
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy")))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, serialized))));
+        }, true);
+        return 0;
+    }
+
+    private static int unlockSealLock(CommandContext<CommandSourceStack> context, String owner, Optional<GameTimeId> id) {
+        if (owner.isBlank()) {
+            context.getSource().sendFailure(Component.literal("Lock owner cannot be empty."));
+            return 0;
+        }
+
+        id.ifPresentOrElse(
+              existingId -> {
+                  SealLock lock = new SealLock(owner, existingId);
+                  if (lock.unlock(context.getSource().getLevel())) {
+                      context.getSource().sendSuccess(() -> Component.literal("Unlocked lock from " + owner), true);
+                  } else {
+                      context.getSource().sendFailure(Component.literal(owner + " does not have any locked locks."));
+                  }
+              },
+              () -> {
+                  if (SealLock.unlockAllFrom(owner, context.getSource().getLevel())) {
+                      context.getSource().sendSuccess(() -> Component.literal("Unlocked all locks from " + owner), true);
+                  } else {
+                      context.getSource().sendFailure(Component.literal(owner + " does not have any locked locks."));
+                  }
+              });
+
+        return 0;
     }
 }

@@ -62,6 +62,7 @@
   "item.envelope.purple_seal_stamp": "Purple Seal Stamp",
   "item.envelope.magenta_seal_stamp": "Magenta Seal Stamp",
   "item.envelope.pink_seal_stamp": "Pink Seal Stamp",
+  "item.envelope.death_seal_stamp": "Death Seal Stamp",
 
   "item.envelope.mailbox": "Mailbox",
 
@@ -78,6 +79,8 @@
 
   "envelope.letter_and_quill.fold_button": "Fold",
   "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
+
+  "gui.envelope.sealed_item.locked": "Seal is protected by the mysterious force",
 
   "gui.envelope.packing.pack": "Pack",
   "gui.envelope.packing.preset_address": "Address",
@@ -158,18 +161,6 @@
   "gui.envelope.delivery_log.message.cloud_depository.capacity_already_at_max": "Expansion Limit Reached",
   "gui.envelope.delivery_log.message.cloud_depository.deposited": "Deposited Into Storage",
   "gui.envelope.delivery_log.message.cloud_depository.withdrawn": "Withdrawn From Storage",
-
-  "gui.envelope.time.remaining": "Remaining: ",
-  "gui.envelope.time.years": "%sy",
-  "gui.envelope.time.months": "%smo",
-  "gui.envelope.time.weeks": "%sw",
-  "gui.envelope.time.days": "%sd",
-  "gui.envelope.time.hours": "%sh",
-  "gui.envelope.time.minutes": "%sm",
-  "gui.envelope.time.seconds": "%ss",
-  "gui.envelope.time.less_than_one_hour": "<1h",
-  "gui.envelope.time.less_than_one_minute": "<1min",
-  "gui.envelope.time.less_than_one_second": "<1s",
 
   "gui.envelope.formatting.aqua": "Aqua",
   "gui.envelope.formatting.black": "Black",

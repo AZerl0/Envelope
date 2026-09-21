@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger.cases.address;
+package io.github.mortuusars.envelope.test.cases.address;
 
 import net.minecraft.server.MinecraftServer;
 

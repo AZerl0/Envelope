@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.component;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import io.github.mortuusars.envelope.world.GameTime;
+import io.github.mortuusars.mortaar.util.GameTime;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -32,10 +32,6 @@ public final class Id implements GameTime, Comparable<Id> {
     }
 
     @Override
-    public long get() {
-        return getTick();
-    }
-
     public long getTick() {
         return tick;
     }
@@ -80,12 +76,8 @@ public final class Id implements GameTime, Comparable<Id> {
     /**
      * Creates new unique Id.
      * @param tick Current game tick.
-     * @throws IllegalArgumentException if passed tick is lesser than last used tick. Use {@link Id#createUnsafe(long)} for arbitrary ticks.
      */
     public static Id create(long tick) {
-        if (tick < currentTick) {
-            throw new IllegalArgumentException("Cannot generate Id for non-current tick: " + tick + ". Current tick: " + currentTick);
-        }
         if (tick != currentTick) {
             currentTick = tick;
             currentSuffix.set(0);
@@ -96,10 +88,9 @@ public final class Id implements GameTime, Comparable<Id> {
     /**
      * Creates new unique Id.
      * @param time Current game time.
-     * @throws IllegalArgumentException if passed tick is lesser than last used tick. Use {@link Id#createUnsafe(GameTime)} for arbitrary ticks.
      */
     public static Id create(GameTime time) {
-        return create(time.get());
+        return create(time.getTick());
     }
 
     /**
@@ -127,7 +118,7 @@ public final class Id implements GameTime, Comparable<Id> {
      * Creates an id that is not guaranteed to be unique for a given tick.
      */
     public static Id createUnsafe(GameTime time) {
-        return createUnsafe(time.get());
+        return createUnsafe(time.getTick());
     }
 
     // --

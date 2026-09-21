@@ -45,7 +45,7 @@ public class EquineAssuranceBureau {
             return;
         }
 
-        Optional<ServiceAddress> bureauAddress = ServiceAddress.get(player.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU);
+        Optional<ServiceAddress> bureauAddress = ServiceAddress.get(ServiceAddress.EQUINE_ASSURANCE_BUREAU, player.registryAccess());
         if (bureauAddress.isEmpty()) {
             return;
         }
@@ -100,7 +100,7 @@ public class EquineAssuranceBureau {
             return false;
         }
 
-        return ServiceAddress.get(level.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU)
+        return ServiceAddress.get(ServiceAddress.EQUINE_ASSURANCE_BUREAU, level.registryAccess())
               .map(address -> {
                   MailService.of(level).getDeliveryManager().startService(Delivery.draft()
                         .deliver(letter)
@@ -140,7 +140,7 @@ public class EquineAssuranceBureau {
     }
 
     public static ItemStack createLetter(ServerLevel level) {
-        Optional<RecipeHolder<MailRecipe>> recipe = ServiceAddress.get(level.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU)
+        Optional<RecipeHolder<MailRecipe>> recipe = ServiceAddress.get(ServiceAddress.EQUINE_ASSURANCE_BUREAU, level.registryAccess())
               .flatMap(address -> Mailing.getAllRecipesOf(address, level)
                     .filter(recipeHolder -> recipeHolder.id().equals(RECIPE_ID))
                     .findFirst());

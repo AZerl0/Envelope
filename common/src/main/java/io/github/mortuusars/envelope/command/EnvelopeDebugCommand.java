@@ -5,17 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
-import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
-import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
-import io.github.mortuusars.envelope.util.bugger.cases.CourierDeliveryTests;
-import io.github.mortuusars.envelope.util.bugger.cases.MailCraftingRecipeTests;
-import io.github.mortuusars.envelope.util.bugger.cases.MailCraftingTests;
-import io.github.mortuusars.envelope.util.bugger.cases.StackIngredientTests;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.mortaar.bugger.test.TestResults;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -29,18 +19,13 @@ import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.Structure;
-
-import java.util.Optional;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
         return Commands.literal("debug")
               .then(Commands.literal("expire_all_awaiting_payback")
                     .executes(EnvelopeDebugCommand::timeoutAllPaybackMail))
-              .then(Commands.literal("run_tests")
-                    .executes(EnvelopeDebugCommand::runBuggerTests))
               .then(Commands.literal("test")
                     .executes(EnvelopeDebugCommand::test));
     }
@@ -60,54 +45,10 @@ public class EnvelopeDebugCommand {
         return 0;
     }
 
-    private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
-        TestResults testResults = new BuggerTests()
-              .add(new StackIngredientTests(context.getSource().getServer()))
-              .add(new CourierDeliveryTests(context.getSource().getServer()))
-              .add(new MailCraftingRecipeTests(context.getSource().getServer()))
-              .add(new MailCraftingTests(context.getSource().getServer()))
-              .run(count -> context.getSource().sendSuccess(() ->
-                    Component.literal("Running " + count + " bugger tests."), true));
-
-        context.getSource().sendSuccess(() -> Component.literal("Bugger tests finished:"), true);
-
-        if (testResults.failed().isEmpty()) {
-            context.getSource().sendSuccess(() -> Component.literal("All tests are passed!")
-                  .withStyle(ChatFormatting.GREEN), true);
-        } else {
-            context.getSource().sendSuccess(() -> Component.literal("Passed: " + testResults.passed().size() + "\n"), true);
-            context.getSource().sendSuccess(() -> Component.literal("Failed: " + testResults.failed().size() + ":")
-                  .withStyle(ChatFormatting.RED), true);
-
-            testResults.failed().forEach(failedTest -> {
-                context.getSource().sendSuccess(() -> Component.literal(" " + failedTest.name() + ": " + failedTest.error())
-                      .withStyle(ChatFormatting.RED), true);
-            });
-        }
-
-        return 0;
-    }
-
     // --
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-
-        ItemStack stack1 = new ItemStack(Envelope.Items.SEALED_LETTER.get());
-        stack1.set(Envelope.DataComponents.SEAL, new Seal(
-              SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.WAX),
-              SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
-              player.getDisplayName(), Optional.of(player.getUUID())));
-        player.addItem(stack1);
-
-        SealMaterial.WAX_COLORS.values().forEach(material -> {
-            ItemStack stack = new ItemStack(Envelope.Items.SEALED_LETTER.get());
-            stack.set(Envelope.DataComponents.SEAL, new Seal(
-                  SealMaterial.getOrThrow(player.registryAccess(), material),
-                  SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
-                  player.getDisplayName(), Optional.of(player.getUUID())));
-            player.addItem(stack);
-        });
 
         /* Structure test
         List<BlockPos> positions = new ArrayList<>();

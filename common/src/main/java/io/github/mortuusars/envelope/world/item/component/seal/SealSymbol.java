@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 public final class SealSymbol {
@@ -108,16 +106,6 @@ public final class SealSymbol {
             return DEFAULT;
         }
         return firstCharOrDefault(player.getScoreboardName());
-    }
-
-    // --
-
-    public static Optional<Holder.Reference<SealSymbol>> get(HolderLookup.Provider registries, ResourceKey<SealSymbol> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SEAL_SYMBOL).get(key);
-    }
-
-    public static Holder<SealSymbol> getOrThrow(HolderLookup.Provider registries, ResourceKey<SealSymbol> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SEAL_SYMBOL).getOrThrow(key);
     }
 
     // --

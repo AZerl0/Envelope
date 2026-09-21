@@ -1,0 +1,10 @@
+{
+  "impression_palette": {
+    "base": "#FF05313A",
+    "highlight": "#FF2E7F80",
+    "shadow": "#FF0D1116",
+    "side": "#FF121D23"
+  },
+  "model_tint_color": "#FF0C4B52",
+  "texture": "envelope:seal/material/sculk"
+}

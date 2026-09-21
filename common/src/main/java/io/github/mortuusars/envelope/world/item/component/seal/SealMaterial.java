@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.mortaar.serialization.Codecs;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -59,6 +58,7 @@ public final class SealMaterial {
     public static final ResourceKey<SealMaterial> MAGENTA_WAX = dyedWax(DyeColor.MAGENTA);
     public static final ResourceKey<SealMaterial> PINK_WAX = dyedWax(DyeColor.PINK);
 
+    public static final ResourceKey<SealMaterial> SCULK = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("sculk"));
     public static final ResourceKey<SealMaterial> GOLD = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("gold"));
 
     private final ResourceLocation textureId;
@@ -134,16 +134,6 @@ public final class SealMaterial {
         return key;
     }
 
-    // --
-
-    public static Optional<Holder.Reference<SealMaterial>> get(HolderLookup.Provider registries, ResourceKey<SealMaterial> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SEAL_MATERIAL).get(key);
-    }
-
-    public static Holder<SealMaterial> getOrThrow(HolderLookup.Provider registries, ResourceKey<SealMaterial> key) {
-        return registries.lookupOrThrow(Envelope.Registries.SEAL_MATERIAL).getOrThrow(key);
-    }
-
     public static ResourceLocation textureLocationFromKey(ResourceKey<SealMaterial> key) {
         return key.location().withPath(path -> "seal/material/" + path);
     }
@@ -166,10 +156,11 @@ public final class SealMaterial {
         register(context, PURPLE_WAX, 0xFFA755DA, 0xFF6C3697, 0xFF9D69CF, 0xFF3D1468, 0xFF53257D, false);
         register(context, MAGENTA_WAX, 0xFFCA6DC4, 0xFF973291, 0xFFCF66CD, 0xFF681369, 0xFF7D247B, false);
         register(context, PINK_WAX, 0xFFF283B9, 0xFFD4548E, 0xFFFA94CD, 0xFFA11D5D, 0xFFBA3C75, false);
+        register(context, SCULK, 0xFF0C4B52, 0xFF06313A, 0xFF2E7F80, 0xFF0D1217, 0xFF131D24, false);
         register(context, GOLD, 0xFFFFB347, 0xFFE39C38, 0xFFFFE685, 0xFFA15611, 0xFFBF7B22, true);
     }
 
-    private static void register(BootstrapContext<SealMaterial> context, ResourceKey<SealMaterial> key, int modelTintColor,
+    public static void register(BootstrapContext<SealMaterial> context, ResourceKey<SealMaterial> key, int modelTintColor,
                                  int paletteBaseColor, int paletteHighlightColor, int paletteShadowColor, int paletteSideColor, boolean hasGlint) {
         context.register(key, new SealMaterial(
               textureLocationFromKey(key),

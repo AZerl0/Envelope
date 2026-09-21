@@ -1,5 +1,6 @@
-package io.github.mortuusars.envelope.util.bugger.cases;
+package io.github.mortuusars.envelope.test.cases;
 
+import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
 import io.github.mortuusars.mortaar.bugger.test.Test;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
@@ -7,7 +8,6 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeInput;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.NonNullList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -15,15 +15,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import java.util.Arrays;
 
 public class MailCraftingRecipeTests extends BuggerTests {
-    private final MinecraftServer server;
-
-    public MailCraftingRecipeTests(MinecraftServer server) {
-        this.server = server;
+    public MailCraftingRecipeTests() {
         matching();
     }
 
     private void matching() {
-        add("MailCraftingRecipe_MatchesIfCorrect", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfCorrect", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -33,7 +30,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.DIAMOND, 6)
               ))));
 
-        add("MailCraftingRecipe_MatchesIfCorrectMultipleOfSame", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfCorrectMultipleOfSame", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND),
@@ -47,7 +44,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.COPPER_INGOT, 6)
               ))));
 
-        add("MailCraftingRecipe_MatchesIfMore", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfMore", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -58,7 +55,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_MatchesIfMoreMultipleOfSame", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfMoreMultipleOfSame", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND),
@@ -72,7 +69,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.COPPER_INGOT, 30)
               ))));
 
-        add("MailCraftingRecipe_MatchesWhenOutOfOrder", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesWhenOutOfOrder", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND),
@@ -86,7 +83,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.DIAMOND, 30)
               ))));
 
-        add("MailCraftingRecipe_MatchesWithEmptyItems", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesWithEmptyItems", Test.isTrue(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -102,7 +99,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
 
         // --
 
-        add("MailCraftingRecipe_Matching_FailsIfInputEmpty", Test.isFalse(() -> matches(
+        add("MailCraftingRecipe_Matching_FailsIfInputEmpty", Test.isFalse(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -113,7 +110,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_FailsIfNotEnough", Test.isFalse(() -> matches(
+        add("MailCraftingRecipe_Matching_FailsIfNotEnough", Test.isFalse(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -123,7 +120,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_FailsIfLessInputs", Test.isFalse(() -> matches(
+        add("MailCraftingRecipe_Matching_FailsIfLessInputs", Test.isFalse(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND),
@@ -135,7 +132,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_FailsIfMoreInputs", Test.isFalse(() -> matches(
+        add("MailCraftingRecipe_Matching_FailsIfMoreInputs", Test.isFalse(player -> matches(
               recipe(
                     Ingredient.of(Items.EMERALD),
                     Ingredient.of(Items.DIAMOND)
@@ -147,7 +144,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_FailsIfMoreInputsOfCorrectItem", Test.isFalse(() ->
+        add("MailCraftingRecipe_Matching_FailsIfMoreInputsOfCorrectItem", Test.isFalse(player ->
               matches(
                     recipe(
                           Ingredient.of(Items.EMERALD),
@@ -165,17 +162,17 @@ public class MailCraftingRecipeTests extends BuggerTests {
 
     private MailCraftingRecipe recipe(Ingredient... ingredients) {
         return new MailCraftingRecipe(
-              MailService.of(server.overworld()).getAddress(),
+              MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress(),
               NonNullList.of(Ingredient.EMPTY, ingredients),
               new ItemStack(Items.BARRIER),
               0);
     }
 
     private MailRecipeInput input(ItemStack... items) {
-        return new MailRecipeInput(server.overworld().getEnvelopeMailService(), Address.UNKNOWN, Arrays.stream(items).toList());
+        return new MailRecipeInput(Platform.getCurrentServerOrThrow().overworld().getEnvelopeMailService(), Address.UNKNOWN, Arrays.stream(items).toList());
     }
 
     private boolean matches(MailCraftingRecipe recipe, MailRecipeInput input) {
-        return recipe.matches(input, server.overworld());
+        return recipe.matches(input, Platform.getCurrentServerOrThrow().overworld());
     }
 }

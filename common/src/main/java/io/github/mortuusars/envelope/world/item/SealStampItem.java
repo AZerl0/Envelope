@@ -6,13 +6,13 @@ import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltip;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.client.Minecrft;
+import io.github.mortuusars.mortaar.resources.Resource;
 import io.github.mortuusars.mortaar.util.supporter.Supporters;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,7 +40,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
     public Holder<SealMaterial> getMaterialOrDefault(ItemStack stack, HolderLookup.Provider registries) {
         return getMaterial(stack)
               .flatMap(eitherHolder -> eitherHolder.unwrap(registries))
-              .orElseGet(() -> SealMaterial.getOrThrow(registries, SealMaterial.WAX));
+              .orElseGet(() -> Resource.getOrThrow(SealMaterial.WAX, registries));
     }
 
     public boolean canDyeWith(ItemStack stack, DyeColor color) {
@@ -66,17 +66,17 @@ public class SealStampItem extends Item implements ApplicatorItem {
     public Holder<SealSymbol> getDieOrDefault(ItemStack stack, HolderLookup.Provider registries, @Nullable Player player) {
         return getDie(stack)
               .flatMap(eitherHolder -> eitherHolder.unwrap(registries))
-              .orElseGet(() -> SealSymbol.getOrThrow(registries, SealSymbol.firstCharOrDefault(player)));
+              .orElseGet(() -> Resource.getOrThrow(SealSymbol.firstCharOrDefault(player), registries));
     }
 
     // -- Seal
 
     public Seal createSeal(ItemStack stack, Player player) {
-        return Seal.createForPlayer(
-              getMaterialOrDefault(stack, player.registryAccess()),
-              getDieOrDefault(stack, player.registryAccess(), player),
-              player
-        );
+        return Seal.create(player.registryAccess())
+              .material(getMaterialOrDefault(stack, player.registryAccess()))
+              .impression(getDieOrDefault(stack, player.registryAccess(), player))
+              .owner(player)
+              .build();
     }
 
     // --
@@ -137,14 +137,15 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
         if (existingSeal != null && existingSeal.getSignatureAsId().equals(player.getScoreboardName()) && canApplyGold(stack, player)) {
-            ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.WAX);
-            ResourceKey<SealMaterial> newMaterial = currentMaterial != SealMaterial.GOLD
-                  ? SealMaterial.GOLD
-                  : getMaterialOrDefault(stack, player.registryAccess()).unwrapKey().orElse(SealMaterial.WAX);
+            //TODO: isLocked check
+            Seal newSeal = Seal.copy(existingSeal, player.registryAccess())
+                  .material(existingSeal.material().is(SealMaterial.GOLD)
+                        ? getMaterialOrDefault(stack, player.registryAccess())
+                        : Resource.getOrThrow(SealMaterial.GOLD, player.registryAccess()))
+                  .owner(player)
+                  .build();
 
-            Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
-
-            target.set(Envelope.DataComponents.SEAL, Seal.createForPlayer(material, existingSeal.impression(), player));
+            target.set(Envelope.DataComponents.SEAL, newSeal);
             slot.set(target);
             player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 1f, player.getRandom().nextFloat() * 0.4f + 0.80f);
             return true;
@@ -155,13 +156,18 @@ public class SealStampItem extends Item implements ApplicatorItem {
             return true;
         }
 
-        ItemStack sealResult = sealable.seal(player.level(), target, createSeal(stack, player));
+        Seal seal = createSeal(stack, player);
+        ItemStack sealResult = applySealToItem(player, sealable, target, seal);
         slot.set(sealResult);
         player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 1f, player.getRandom().nextFloat() * 0.4f + 0.80f);
 
         player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 
         return true;
+    }
+
+    protected ItemStack applySealToItem(Player player, SealableItem sealable, ItemStack target, Seal seal) {
+        return sealable.seal(player.level(), target, seal);
     }
 
     public static class Client {

@@ -3,7 +3,9 @@ package io.github.mortuusars.envelope.world.item.crafting;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.SealStampItem;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.mortaar.resources.Resource;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +16,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public class SealStampDyeingRecipe extends CustomRecipe {
     public SealStampDyeingRecipe(CraftingBookCategory category) {
@@ -84,9 +88,19 @@ public class SealStampDyeingRecipe extends CustomRecipe {
 
         ItemStack finalStampStack = stampStack;
         @Nullable DyeItem finalDye = dye;
-        return SealMaterial.get(registries, SealMaterial.fromDyeColor(dye.getDyeColor()))
+
+        @Nullable ResourceKey<SealMaterial> dyedMaterialKey = SealMaterial.fromDyeColor(dye.getDyeColor());
+        if (dyedMaterialKey == null) {
+            return ItemStack.EMPTY;
+        }
+
+        return Resource.get(dyedMaterialKey, registries)
               .map(material -> {
-                  ItemStack result = finalStampStack.transmuteCopy(Envelope.Items.DYED_SEAL_STAMPS.get(finalDye.getDyeColor()).get());
+                  @Nullable Supplier<SealStampItem> dyedStamp = Envelope.Items.DYED_SEAL_STAMPS.get(finalDye.getDyeColor());
+                  if (dyedStamp == null) {
+                      return ItemStack.EMPTY;
+                  }
+                  ItemStack result = finalStampStack.transmuteCopy(dyedStamp.get());
                   result.set(Envelope.DataComponents.SEAL_STAMP_MATERIAL, new EitherHolder<>(material));
                   return result;
               })
