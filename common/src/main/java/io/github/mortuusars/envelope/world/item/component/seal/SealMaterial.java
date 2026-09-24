@@ -19,14 +19,14 @@ import java.util.*;
 
 public final class SealMaterial {
     public static final Codec<SealMaterial> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-          ResourceLocation.CODEC.fieldOf("texture").forGetter(SealMaterial::textureId),
+          ResourceLocation.CODEC.fieldOf("sprite").forGetter(SealMaterial::sprite),
           Codecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
           ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette),
           Codec.BOOL.optionalFieldOf("has_glint", false).forGetter(SealMaterial::hasGlint)
     ).apply(i, SealMaterial::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealMaterial> DIRECT_STREAM_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC, SealMaterial::textureId,
+          ResourceLocation.STREAM_CODEC, SealMaterial::sprite,
           ByteBufCodecs.INT, SealMaterial::modelTintColor,
           ShadingPalette.STREAM_CODEC, SealMaterial::impressionPalette,
           ByteBufCodecs.BOOL, SealMaterial::hasGlint,
@@ -61,15 +61,13 @@ public final class SealMaterial {
     public static final ResourceKey<SealMaterial> SCULK = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("sculk"));
     public static final ResourceKey<SealMaterial> GOLD = ResourceKey.create(Envelope.Registries.SEAL_MATERIAL, Envelope.resource("gold"));
 
-    private final ResourceLocation textureId;
-    private final ResourceLocation textureFull;
+    private final ResourceLocation sprite;
     private final int modelTintColor;
     private final ShadingPalette impressionPalette;
     private final boolean hasGlint;
 
-    public SealMaterial(ResourceLocation texture, int modelTintColor, ShadingPalette impressionPalette, boolean hasGlint) {
-        this.textureId = texture;
-        this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
+    public SealMaterial(ResourceLocation sprite, int modelTintColor, ShadingPalette impressionPalette, boolean hasGlint) {
+        this.sprite = sprite;
         this.modelTintColor = modelTintColor;
         this.impressionPalette = impressionPalette;
         this.hasGlint = hasGlint;
@@ -79,12 +77,8 @@ public final class SealMaterial {
         return WAX_COLORS.get(color);
     }
 
-    public ResourceLocation textureId() {
-        return textureId;
-    }
-
-    public ResourceLocation texture() {
-        return textureFull;
+    public ResourceLocation sprite() {
+        return sprite;
     }
 
     public int modelTintColor() {
@@ -104,7 +98,7 @@ public final class SealMaterial {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (SealMaterial) obj;
-        return Objects.equals(this.textureId, that.textureId) &&
+        return Objects.equals(this.sprite, that.sprite) &&
               this.modelTintColor == that.modelTintColor &&
               Objects.equals(this.impressionPalette, that.impressionPalette);
     }
@@ -112,7 +106,7 @@ public final class SealMaterial {
     @Override
     public int hashCode() {
         int i = 1;
-        i = 31 * i + this.textureId.hashCode();
+        i = 31 * i + this.sprite.hashCode();
         i = 31 * i + this.modelTintColor;
         return 31 * i + this.impressionPalette.hashCode();
     }
@@ -120,7 +114,7 @@ public final class SealMaterial {
     @Override
     public String toString() {
         return "SealMaterial[" +
-              "texture=" + textureId + ", " +
+              "sprite=" + sprite + ", " +
               "modelTintColor=" + modelTintColor + ", " +
               "impressionPalette=" + impressionPalette + "," +
               "hasGlint=" + hasGlint + ']';

@@ -21,11 +21,11 @@ import java.util.function.Function;
 
 public final class SealSymbol {
     public static final Codec<SealSymbol> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-          ResourceLocation.CODEC.fieldOf("texture").forGetter(SealSymbol::textureId)
+          ResourceLocation.CODEC.fieldOf("sprite").forGetter(SealSymbol::sprite)
     ).apply(i, SealSymbol::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealSymbol> DIRECT_STREAM_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC, SealSymbol::textureId,
+          ResourceLocation.STREAM_CODEC, SealSymbol::sprite,
           SealSymbol::new
     );
 
@@ -69,20 +69,14 @@ public final class SealSymbol {
 
     // --
 
-    private final ResourceLocation texture;
-    private final ResourceLocation textureFull;
+    private final ResourceLocation sprite;
 
-    public SealSymbol(ResourceLocation texture) {
-        this.texture = texture;
-        this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
+    public SealSymbol(ResourceLocation sprite) {
+        this.sprite = sprite;
     }
 
-    public ResourceLocation textureId() {
-        return texture;
-    }
-
-    public ResourceLocation texture() {
-        return textureFull;
+    public ResourceLocation sprite() {
+        return sprite;
     }
 
     public static ResourceKey<SealSymbol> firstCharOrDefault(String string) {

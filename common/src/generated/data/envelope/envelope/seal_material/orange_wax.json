@@ -6,5 +6,5 @@
     "side": "#FFB55C1D"
   },
   "model_tint_color": "#FFF39B19",
-  "texture": "envelope:seal/material/orange_wax"
+  "sprite": "envelope:seal/material/orange_wax"
 }

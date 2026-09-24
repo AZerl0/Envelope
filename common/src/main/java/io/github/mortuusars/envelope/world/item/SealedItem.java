@@ -52,7 +52,7 @@ public interface SealedItem {
         ItemStack stack = player.getItemInHand(hand);
         if (!canRemoveSeal(stack, player)) {
             player.displayClientMessage(Component.translatable("gui.envelope.sealed_item.locked").withStyle(ChatFormatting.RED), true);
-            player.playSound(SoundEvents.SCULK_BLOCK_CHARGE);
+            player.playSound(SoundEvents.SCULK_BLOCK_FALL);
             return InteractionResultHolder.fail(stack);
         }
 
@@ -109,9 +109,10 @@ public interface SealedItem {
             return seal.lock()
                   .map(lock -> {
                       if (lock.isLocked(Minecrft.level())) {
-                          float time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true))
-                                * 3f % 179f;
-                          return FastColor.ARGB32.lerp(Mth.sin((float)Math.toRadians(time)), materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
+                          double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 20.0;
+                          double beat = Math.pow((Math.sin(time * Math.PI * 2 * 1) + 1.0) * 0.5, 10);
+                          float delta = (float) Mth.lerp(beat, 0, 1);
+                          return FastColor.ARGB32.lerp(delta, materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
                       } else {
                           return materialColor;
                       }

@@ -1,5 +1,10 @@
 # Changelog
 
+## UNRELEASED
+Technical Changes
+- Moved seal-related textures from `textures/seal` to `textures/gui/sprites/seal` folder to allow for animations with .mcmeta files
+- Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions  
+
 ## 0.8.0-Snapshot1
 ### New features
 Seal

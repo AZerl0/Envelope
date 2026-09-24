@@ -10,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public class DeathSealStampItem extends SealStampItem {
-    public DeathSealStampItem(Properties properties) {
+public class SoulboundSealStampItem extends SealStampItem {
+    public SoulboundSealStampItem(Properties properties) {
         super(properties);
     }
 

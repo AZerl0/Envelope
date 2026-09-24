@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/death_seal_stamp"
+    "layer0": "envelope:item/soulbound_seal_stamp"
   }
 }

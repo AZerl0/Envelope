@@ -360,8 +360,8 @@ public class Envelope {
         public static final Supplier<SealStampItem> PURPLE_SEAL_STAMP = dyedStamp(DyeColor.PURPLE);
         public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = dyedStamp(DyeColor.MAGENTA);
         public static final Supplier<SealStampItem> PINK_SEAL_STAMP = dyedStamp(DyeColor.PINK);
-        public static final Supplier<DeathSealStampItem> DEATH_SEAL_STAMP = REGISTRAR.item("death_seal_stamp",
-              () -> new DeathSealStampItem(stampProperties(SealMaterial.SCULK)));
+        public static final Supplier<SoulboundSealStampItem> SOULBOUND_SEAL_STAMP = REGISTRAR.item("soulbound_seal_stamp",
+              () -> new SoulboundSealStampItem(stampProperties(SealMaterial.SCULK)));
 
         private static Supplier<SealStampItem> dyedStamp(DyeColor color) {
             @Nullable ResourceKey<SealMaterial> materialKey = SealMaterial.fromDyeColor(color);
@@ -412,7 +412,7 @@ public class Envelope {
 
                         output.accept(Items.SEAL_STAMP.get());
                         Items.DYED_SEAL_STAMPS.values().forEach(stamp -> output.accept(stamp.get()));
-                        output.accept(Items.DEATH_SEAL_STAMP.get());
+                        output.accept(Items.SOULBOUND_SEAL_STAMP.get());
 
                         output.accept(Items.PIGEON_SPAWN_EGG.get());
                         output.accept(Items.CHARRED_PIGEON_SPAWN_EGG.get());
