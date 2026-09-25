@@ -13,10 +13,13 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
 
-public class SealStampDyeingRecipeRecipeExtension implements ICraftingCategoryExtension<SealStampDyeingRecipe> {
+public class SealStampDyeingRecipeExtension implements ICraftingCategoryExtension<SealStampDyeingRecipe> {
     @Override
     public void setRecipe(RecipeHolder<SealStampDyeingRecipe> holder, IRecipeLayoutBuilder builder,
                           ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+
+
+
         List<ItemStack> stamps = List.of(new ItemStack(Envelope.Items.SEAL_STAMP.get()));
         List<ItemStack> dyes = Envelope.Items.DYED_SEAL_STAMPS.keySet().stream().map(DyeItem::byColor).map(ItemStack::new).toList();
         List<ItemStack> results = Envelope.Items.DYED_SEAL_STAMPS.values().stream().map(i -> new ItemStack(i.get())).toList();

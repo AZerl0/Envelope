@@ -1,0 +1,21 @@
+{
+  "values": [
+    "envelope:seal_stamp",
+    "envelope:white_seal_stamp",
+    "envelope:light_gray_seal_stamp",
+    "envelope:gray_seal_stamp",
+    "envelope:black_seal_stamp",
+    "envelope:brown_seal_stamp",
+    "envelope:red_seal_stamp",
+    "envelope:orange_seal_stamp",
+    "envelope:yellow_seal_stamp",
+    "envelope:lime_seal_stamp",
+    "envelope:green_seal_stamp",
+    "envelope:cyan_seal_stamp",
+    "envelope:light_blue_seal_stamp",
+    "envelope:blue_seal_stamp",
+    "envelope:purple_seal_stamp",
+    "envelope:magenta_seal_stamp",
+    "envelope:pink_seal_stamp"
+  ]
+}

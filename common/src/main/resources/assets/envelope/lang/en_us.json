@@ -403,6 +403,12 @@
   "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
   "envelope.configuration.phase_duration_modifier": "Phase Duration Modifier",
   "envelope.configuration.information": "Information",
+  "envelope.configuration.seal": "Seal",
+  "envelope.configuration.seal_remove_duration": "Seal Remove Duration",
+  "envelope.configuration.soulbound_seal_stamp_enabled": "Soulbound Seal Stamp - Enabled",
+  "envelope.configuration.soulbound_seal_stamp_consumable": "Soulbound Seal Stamp - Consumable",
+  "envelope.configuration.soulbound_seal_stamp_creates_lock": "Soulbound Seal Stamp - Creates Lock",
+  "envelope.configuration.locked_seal_owner_can_remove_without_unlocking": "Locked Seal - Owner Can Always Remove",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

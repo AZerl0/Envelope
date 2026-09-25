@@ -48,6 +48,13 @@ public abstract class Config {
         public static final ModConfigSpec.DoubleValue PACKAGE_PAPER_BOX_RETURN_CHANCE;
         public static final ModConfigSpec.DoubleValue PAYBACK_PACKAGE_BOX_RETURN_CHANCE;
 
+        // Seal
+        public static final ModConfigSpec.IntValue SEAL_REMOVE_DURATION;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_ENABLED;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CONSUMABLE;
+        public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CREATES_LOCK;
+        public static final ModConfigSpec.BooleanValue LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING;
+
         // Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
@@ -75,9 +82,6 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
         public static final ModConfigSpec.DoubleValue ARCHIMEDES_CHANCE;
-
-        // Debug
-        public static final ModConfigSpec.BooleanValue DEBUG;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -209,6 +213,28 @@ public abstract class Config {
             }
 
             {
+                builder.push("seal");
+                SEAL_REMOVE_DURATION = builder
+                      .comment("How much time (in ticks) player needs to use a sealed item before the seal is removed.")
+                      .defineInRange("seal_remove_duration", 10, 0, 9999);
+                SOULBOUND_SEAL_STAMP_ENABLED = builder
+                      .comment("Soulbound Seal Stamp item is enabled. If set to false, item will not be craftable and usable.", "Default: true")
+                      .define("soulbound_seal_stamp_enabled", true);
+                SOULBOUND_SEAL_STAMP_CONSUMABLE = builder
+                      .comment("Soulbound Seal Stamp will have durability which will decrease on each seal application.",
+                            "If durability reaches 0 - Soulbound Seal Stamp will be converted into a regular Seal Stamp.")
+                      .define("soulbound_seal_stamp_consumable", true);
+                SOULBOUND_SEAL_STAMP_CREATES_LOCK = builder
+                      .comment("Soulbound Seal Stamp will create a seal lock when the item is sealed.",
+                            "Seal lock keeps the item in owner's inventory when they die, or prevents other player from removing the seal until the owner dies.")
+                      .define("soulbound_seal_stamp_creates_lock", true);
+                LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING = builder
+                      .comment("Locked seals (created by Soulbound Seal Stamp or commands) can be removed by their owner regardless of their lock status.")
+                      .define("locked_seal_owner_can_remove_without_unlocking", true);
+                builder.pop();
+            }
+
+            {
                 builder.push("delivery");
                 DELIVERY_DEFAULT_DISTANCE = builder
                       .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined (recipient does not exist, for example).")
@@ -291,14 +317,6 @@ public abstract class Config {
                 ARCHIMEDES_CHANCE = builder
                       .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
                       .defineInRange("archimedes_chance", 0.05, 0, 1);
-                builder.pop();
-            }
-
-            {
-                builder.push("debug");
-                DEBUG = builder
-                      .comment("Enable debug features. Will negatively impact performance. Don't enable unless it's needed.")
-                      .define("debug_mode", false);
                 builder.pop();
             }
 

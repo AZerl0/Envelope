@@ -6,6 +6,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class ItemTagsDatagen extends ItemTagsProvider {
     public ItemTagsDatagen(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagLookup<Block>> blockTags, @Nullable ExistingFileHelper existingFileHelper) {
@@ -56,6 +58,14 @@ public class ItemTagsDatagen extends ItemTagsProvider {
         tag(Envelope.Tags.Items.PACKAGES)
               .add(Envelope.Items.PACKAGE.get())
               .add(Envelope.Items.SEALED_PACKAGE.get());
+
+        tag(Envelope.Tags.Items.REGULAR_SEAL_STAMPS)
+              .add(Envelope.Items.SEAL_STAMP.get())
+              .add(Envelope.Items.DYED_SEAL_STAMPS.values().stream().map(Supplier::get).toArray(Item[]::new));
+
+        tag(Envelope.Tags.Items.SEAL_STAMPS)
+              .addTag(Envelope.Tags.Items.REGULAR_SEAL_STAMPS)
+              .add(Envelope.Items.SOULBOUND_SEAL_STAMP.get());
 
         tag(Envelope.Tags.Items.MAILABLE)
               .add(Envelope.Items.LETTER.get())

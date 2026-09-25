@@ -77,6 +77,15 @@ public final class SealMaterial {
         return WAX_COLORS.get(color);
     }
 
+    public static @Nullable DyeColor colorFromMaterial(ResourceKey<SealMaterial> key) {
+        for (Map.Entry<DyeColor, ResourceKey<SealMaterial>> entry : WAX_COLORS.entrySet()) {
+            if (entry.getValue().equals(key)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public ResourceLocation sprite() {
         return sprite;
     }
@@ -128,7 +137,7 @@ public final class SealMaterial {
         return key;
     }
 
-    public static ResourceLocation textureLocationFromKey(ResourceKey<SealMaterial> key) {
+    public static ResourceLocation spriteLocationFromKey(ResourceKey<SealMaterial> key) {
         return key.location().withPath(path -> "seal/material/" + path);
     }
 
@@ -157,7 +166,7 @@ public final class SealMaterial {
     public static void register(BootstrapContext<SealMaterial> context, ResourceKey<SealMaterial> key, int modelTintColor,
                                  int paletteBaseColor, int paletteHighlightColor, int paletteShadowColor, int paletteSideColor, boolean hasGlint) {
         context.register(key, new SealMaterial(
-              textureLocationFromKey(key),
+              spriteLocationFromKey(key),
               modelTintColor,
               new ShadingPalette(paletteBaseColor, paletteHighlightColor, paletteShadowColor, paletteSideColor), hasGlint));
     }

@@ -62,12 +62,12 @@ public class NeoForgeClientEvents {
 
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register(SealedItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
-        event.register(SealedItem::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+        event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
     }
 
     @SubscribeEvent
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
-        event.register(SealedItem::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
+        event.register(SealedItem.Client::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
     }
 }

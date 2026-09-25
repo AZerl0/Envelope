@@ -1,0 +1,16 @@
+{
+  "type": "envelope:component_transferring",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:echo_shard"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:soulbound_seal_stamp"
+  },
+  "source": {
+    "tag": "envelope:regular_seal_stamps"
+  }
+}

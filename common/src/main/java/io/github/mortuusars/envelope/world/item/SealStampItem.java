@@ -69,16 +69,6 @@ public class SealStampItem extends Item implements ApplicatorItem {
               .orElseGet(() -> Resource.getOrThrow(SealSymbol.firstCharOrDefault(player), registries));
     }
 
-    // -- Seal
-
-    public Seal createSeal(ItemStack stack, Player player) {
-        return Seal.create(player.registryAccess())
-              .material(getMaterialOrDefault(stack, player.registryAccess()))
-              .impression(getDieOrDefault(stack, player.registryAccess(), player))
-              .owner(player)
-              .build();
-    }
-
     // --
 
     @Override
@@ -105,11 +95,14 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of((TooltipComponent) new SealDieTooltip(getDie(stack)))
-              .filter(tooltip -> !Platform.isClient()
-                    || !Config.Client.HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY.get()
-                    || stack.has(Envelope.DataComponents.SEAL_STAMP_DIE)
-                    || Client.isInInventory(stack));
+        if (stack.has(Envelope.DataComponents.SEAL_STAMP_DIE)
+              || !Platform.isClient()
+              || !Config.Client.HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY.get()
+              || Client.isInInventory(stack)) {
+            return Optional.of(new SealDieTooltip(getDie(stack)));
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -136,8 +129,10 @@ public class SealStampItem extends Item implements ApplicatorItem {
         ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
-        if (existingSeal != null && existingSeal.getSignatureAsId().equals(player.getScoreboardName()) && canApplyGold(stack, player)) {
-            //TODO: isLocked check
+        if (existingSeal != null
+              && existingSeal.getSignatureAsId().equals(player.getScoreboardName())
+              && canApplyGold(stack, player)
+              && (existingSeal.lock().isEmpty() || !existingSeal.lock().get().isLocked(player.level()))) {
             Seal newSeal = Seal.copy(existingSeal, player.registryAccess())
                   .material(existingSeal.material().is(SealMaterial.GOLD)
                         ? getMaterialOrDefault(stack, player.registryAccess())
@@ -157,18 +152,33 @@ public class SealStampItem extends Item implements ApplicatorItem {
         }
 
         Seal seal = createSeal(stack, player);
-        ItemStack sealResult = applySealToItem(player, sealable, target, seal);
+        ItemStack sealResult = applySealToItem(stack, player, sealable, target, seal);
         slot.set(sealResult);
-        player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 1f, player.getRandom().nextFloat() * 0.4f + 0.80f);
-
-        player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
+        onSealApplied(stack, player, sealable, target, seal);
 
         return true;
     }
 
-    protected ItemStack applySealToItem(Player player, SealableItem sealable, ItemStack target, Seal seal) {
+    // -- Seal
+
+    public Seal createSeal(ItemStack stack, Player player) {
+        return Seal.create(player.registryAccess())
+              .material(getMaterialOrDefault(stack, player.registryAccess()))
+              .impression(getDieOrDefault(stack, player.registryAccess(), player))
+              .owner(player)
+              .build();
+    }
+
+    protected ItemStack applySealToItem(ItemStack stack, Player player, SealableItem sealable, ItemStack target, Seal seal) {
         return sealable.seal(player.level(), target, seal);
     }
+
+    protected void onSealApplied(ItemStack stack, Player player, SealableItem sealable, ItemStack target, Seal seal) {
+        player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 0.75f, player.getRandom().nextFloat() * 0.4f + 0.80f);
+        player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
+    }
+
+    // --
 
     public static class Client {
         public static boolean isInInventory(ItemStack stack) {

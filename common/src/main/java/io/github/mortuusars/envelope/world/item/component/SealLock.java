@@ -1,8 +1,9 @@
 package io.github.mortuusars.envelope.world.item.component;
 
-import com.mojang.datafixers.DataFixUtils;
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.level.saveddata.SealLocks;
 import io.github.mortuusars.mortaar.util.GameTimeId;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -17,11 +18,6 @@ import org.jetbrains.annotations.NotNull;
  * Defines a lock that can be locked or unlocked, depending on its presence in {@link SealLocks}.
  */
 public record SealLock(String owner, GameTimeId id) {
-//    public static final Codec<SealLock> CODEC = RecordCodecBuilder.create(i -> i.group(
-//          Codec.STRING.fieldOf("owner").forGetter(SealLock::owner),
-//          GameTimeId.CODEC.fieldOf("id").forGetter(SealLock::id)
-//    ).apply(i, SealLock::new));
-
     public static final Codec<SealLock> CODEC = Codec.STRING.comapFlatMap(SealLock::parse, SealLock::toString);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealLock> STREAM_CODEC = StreamCodec.composite(
@@ -29,6 +25,10 @@ public record SealLock(String owner, GameTimeId id) {
           GameTimeId.STREAM_CODEC, SealLock::id,
           SealLock::new
     );
+
+    public SealLock {
+        Preconditions.checkArgument(!owner.isBlank(), "Owner cannot be empty.");
+    }
 
     public static DataResult<SealLock> parse(String string) {
         if (StringUtil.isNullOrEmpty(string)) {
@@ -57,7 +57,7 @@ public record SealLock(String owner, GameTimeId id) {
     // --
 
     public boolean isOwnedBy(Player player) {
-        return owner.equals(player.getScoreboardName());
+        return owner.equalsIgnoreCase(player.getScoreboardName());
     }
 
     public boolean isLocked(Level level) {
@@ -65,7 +65,11 @@ public record SealLock(String owner, GameTimeId id) {
     }
 
     public boolean isLockedFor(Player player) {
-        return !isOwnedBy(player) && isLocked(player.level());
+        if (Config.Server.LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING.get() && isOwnedBy(player)) {
+            return false;
+        }
+
+        return isLocked(player.level());
     }
 
     public boolean lock(Level level) {

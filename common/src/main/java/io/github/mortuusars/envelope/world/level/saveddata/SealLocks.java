@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundSyncDeathLockDataPacket;
 import io.github.mortuusars.envelope.world.item.component.SealLock;
+import io.github.mortuusars.mortaar.Platform;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -60,7 +61,7 @@ public class SealLocks extends SavedData {
     }
 
     public boolean unlockAllFrom(String owner) {
-        if (locks.removeIf(lock -> lock.owner().equals(owner))) {
+        if (locks.removeIf(lock -> lock.owner().equalsIgnoreCase(owner))) {
             setDirty();
             return true;
         }
@@ -72,15 +73,21 @@ public class SealLocks extends SavedData {
     @Override
     public void setDirty() {
         super.setDirty();
-        syncToAllClients();
+        if (Platform.isDedicatedServer()) {
+            syncToAllClients();
+        }
     }
 
     public void syncToAllClients() {
-        new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToAllClients();
+        if (Platform.isDedicatedServer()) {
+            new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToAllClients();
+        }
     }
 
     public void syncToClient(ServerPlayer player) {
-        new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToClient(player);
+        if (Platform.isDedicatedServer()) {
+            new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToClient(player);
+        }
     }
 
     // -- Save / Load

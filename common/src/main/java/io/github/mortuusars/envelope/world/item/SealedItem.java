@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -37,7 +38,7 @@ public interface SealedItem {
     }
 
     default int getUnsealingDuration(ItemStack stack, LivingEntity entity) {
-        return 20; //TODO: config
+        return Config.Server.SEAL_REMOVE_DURATION.get();
     }
 
     default boolean canRemoveSeal(ItemStack stack, Player player) {
@@ -96,45 +97,47 @@ public interface SealedItem {
 
     // --
 
-    int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF158292;
+    class Client {
+        public static int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF158292;
 
-    static int getSealOverlayColor(ItemStack stack, int layer) {
-        if (layer != 1) {
-            return -1;
-        }
-
-        @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
-        if (seal != null) {
-            int materialColor = seal.material().value().modelTintColor();
-            return seal.lock()
-                  .map(lock -> {
-                      if (lock.isLocked(Minecrft.level())) {
-                          double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 20.0;
-                          double beat = Math.pow((Math.sin(time * Math.PI * 2 * 1) + 1.0) * 0.5, 10);
-                          float delta = (float) Mth.lerp(beat, 0, 1);
-                          return FastColor.ARGB32.lerp(delta, materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
-                      } else {
-                          return materialColor;
-                      }
-                  })
-                  .orElse(materialColor);
-        }
-
-        return 0xFFCC4E47; // Default red color
-    }
-
-    static int getSealOverlayColor(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int index) {
-        if (index != 0) {
-            return -1;
-        }
-
-        if (level != null && pos != null && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
-            @Nullable Seal seal = blockEntity.getPackage().get(Envelope.DataComponents.SEAL);
-            if (seal != null) {
-                return seal.material().value().modelTintColor();
+        public static int getSealOverlayColor(ItemStack stack, int layer) {
+            if (layer != 1) {
+                return -1;
             }
+
+            @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
+            if (seal != null) {
+                int materialColor = seal.material().value().modelTintColor();
+                return seal.lock()
+                      .map(lock -> {
+                          if (lock.isLocked(Minecrft.level())) {
+                              double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 20.0;
+                              double beat = Math.pow((Math.sin(time * Math.PI * 2 * 1) + 1.0) * 0.5, 10);
+                              float delta = (float) Mth.lerp(beat, 0, 1);
+                              return FastColor.ARGB32.lerp(delta, materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
+                          } else {
+                              return materialColor;
+                          }
+                      })
+                      .orElse(materialColor);
+            }
+
+            return 0xFFCC4E47; // Default red color
         }
 
-        return 0xFFCC4E47; // Default red color
+        public static int getSealOverlayColor(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int index) {
+            if (index != 0) {
+                return -1;
+            }
+
+            if (level != null && pos != null && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
+                @Nullable Seal seal = blockEntity.getPackage().get(Envelope.DataComponents.SEAL);
+                if (seal != null) {
+                    return seal.material().value().modelTintColor();
+                }
+            }
+
+            return 0xFFCC4E47; // Default red color
+        }
     }
 }

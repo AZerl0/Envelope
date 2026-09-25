@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPr
 import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate;
 import io.github.mortuusars.envelope.api.ServiceDropOffHandlerRegistry;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
+import io.github.mortuusars.envelope.command.argument.SealLockArgument;
 import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
 import io.github.mortuusars.envelope.network.packet.clientbound.*;
@@ -155,10 +156,6 @@ public class Envelope {
      */
     public static ResourceLocation resource(String path) {
         return ResourceLocation.fromNamespaceAndPath(ID, path);
-    }
-
-    public static boolean debug() {
-        return Config.Server.DEBUG.get();
     }
 
     @ExpectPlatform
@@ -361,7 +358,7 @@ public class Envelope {
         public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = dyedStamp(DyeColor.MAGENTA);
         public static final Supplier<SealStampItem> PINK_SEAL_STAMP = dyedStamp(DyeColor.PINK);
         public static final Supplier<SoulboundSealStampItem> SOULBOUND_SEAL_STAMP = REGISTRAR.item("soulbound_seal_stamp",
-              () -> new SoulboundSealStampItem(stampProperties(SealMaterial.SCULK)));
+              () -> new SoulboundSealStampItem(new Item.Properties().durability(8).stacksTo(1)));
 
         private static Supplier<SealStampItem> dyedStamp(DyeColor color) {
             @Nullable ResourceKey<SealMaterial> materialKey = SealMaterial.fromDyeColor(color);
@@ -464,12 +461,10 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = REGISTRAR.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
-//        public static final DataComponentType<SealLock> SEAL_DEATH_LOCK = REGISTRAR.dataComponentType("seal_death_lock",
-//              b -> b.persistent(SealLock.CODEC).networkSynchronized(SealLock.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<EitherHolder<SealMaterial>> SEAL_STAMP_MATERIAL = REGISTRAR.dataComponentType("seal_stamp_material",
-              b -> b.persistent(EitherHolder.codec(Registries.SEAL_MATERIAL, SealMaterial.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_MATERIAL, SealMaterial.STREAM_CODEC)).cacheEncoding());
+              b -> b.persistent(EitherHolder.codec(Registries.SEAL_MATERIAL, SealMaterial.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_MATERIAL, SealMaterial.STREAM_CODEC)));
         public static final DataComponentType<EitherHolder<SealSymbol>> SEAL_STAMP_DIE = REGISTRAR.dataComponentType("seal_stamp_die",
-              b -> b.persistent(EitherHolder.codec(Registries.SEAL_SYMBOL, SealSymbol.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_SYMBOL, SealSymbol.STREAM_CODEC)).cacheEncoding());
+              b -> b.persistent(EitherHolder.codec(Registries.SEAL_SYMBOL, SealSymbol.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_SYMBOL, SealSymbol.STREAM_CODEC)));
 
         // -- Payback
 
@@ -559,6 +554,9 @@ public class Envelope {
               "crafting_special_payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
         public static final Supplier<RecipeSerializer<SealStampDyeingRecipe>> SEAL_STAMP_DYEING = REGISTRAR.recipeSerializer(
               "crafting_special_seal_stamp_dyeing", () -> new SimpleCraftingRecipeSerializer<>(SealStampDyeingRecipe::new));
+
+        public static final Supplier<RecipeSerializer<ComponentTransferringRecipe>> COMPONENT_TRANSFERRING = REGISTRAR.recipeSerializer(
+                    "component_transferring", () -> new ComponentTransferringRecipeSerializer<>(ComponentTransferringRecipe::new));
 
         public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = REGISTRAR.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
@@ -748,6 +746,10 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("letters"));
             public static final TagKey<Item> PACKAGES =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
+            public static final TagKey<Item> SEAL_STAMPS =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("seal_stamps"));
+            public static final TagKey<Item> REGULAR_SEAL_STAMPS =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("regular_seal_stamps"));
             public static final TagKey<Item> MAILABLE =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
             public static final TagKey<Item> CANNOT_BE_PACKAGED =
@@ -801,6 +803,8 @@ public class Envelope {
     public static class ArgumentTypes {
         public static final Supplier<ArgumentTypeInfo<AddressArgument, SingletonArgumentInfo<AddressArgument>.Template>> ADDRESS =
               REGISTRAR.commandArgumentType("address", AddressArgument.class, SingletonArgumentInfo.contextFree(AddressArgument::all));
+        public static final Supplier<ArgumentTypeInfo<SealLockArgument, SingletonArgumentInfo<SealLockArgument>.Template>> SEAL_LOCK =
+              REGISTRAR.commandArgumentType("seal_lock", SealLockArgument.class, SingletonArgumentInfo.contextFree(SealLockArgument::new));
 
         public static void init() {
         }

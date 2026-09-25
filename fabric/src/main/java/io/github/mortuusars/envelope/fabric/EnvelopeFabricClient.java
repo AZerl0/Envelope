@@ -41,9 +41,9 @@ public class EnvelopeFabricClient implements ClientModInitializer {
 
         BlockRenderLayerMap.INSTANCE.putBlock(Envelope.Blocks.LETTER.get(), RenderType.cutout());
 
-        ColorProviderRegistry.ITEM.register(SealedItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
-        ColorProviderRegistry.ITEM.register(SealedItem::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
-        ColorProviderRegistry.BLOCK.register(SealedItem::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
+        ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+        ColorProviderRegistry.BLOCK.register(SealedItem.Client::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKING.get(), PackingScreen::new);

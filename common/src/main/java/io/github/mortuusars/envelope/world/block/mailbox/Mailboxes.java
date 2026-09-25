@@ -1,12 +1,12 @@
 package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.mortaar.bugger.Bugger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +74,7 @@ public class Mailboxes {
 
         RegisteredMailbox data = new RegisteredMailbox(address, pos);
         getMailboxes().put(address, data);
-        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.getString(), pos.toShortString());
+        if (Bugger.isEnabled()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.getString(), pos.toShortString());
         setDirty();
         return address;
     }
@@ -84,7 +84,7 @@ public class Mailboxes {
         if (removed != null) {
             MailService.of(level).getKnownPlayers().removeDefaultAddress(address);
             setDirty();
-            if (Envelope.debug()) LOGGER.info("Removed mailbox '{}'@[{}]",
+            LOGGER.debug("Removed mailbox '{}'@[{}]",
                   removed.getAddress().getString(), removed.getPos().toShortString());
         }
     }
@@ -103,9 +103,8 @@ public class Mailboxes {
         getMailboxes().remove(data.getAddress());
         getMailboxes().put(newAddress, newData);
 
-        if (Envelope.debug()) {
-            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().getString(), data.getPos().toShortString(), newAddress.getString());
-        }
+        LOGGER.debug("Renamed mailbox '{}'@[{}] to '{}'",
+              data.getAddress().getString(), data.getPos().toShortString(), newAddress.getString());
 
         setDirty();
 

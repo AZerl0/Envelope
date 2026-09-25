@@ -112,6 +112,12 @@ public class RecipesDatagen extends RecipeProvider {
         SpecialRecipeBuilder.special(PaybackTagApplicationRecipe::new).save(output, Envelope.resource("payback_tag_application"));
         SpecialRecipeBuilder.special(SealStampDyeingRecipe::new).save(output, Envelope.resource("seal_stamp_dyeing"));
 
+        SpecialRecipeBuilder.special(category -> new ComponentTransferringRecipe(category,
+                    Ingredient.of(Envelope.Tags.Items.REGULAR_SEAL_STAMPS),
+                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Items.ECHO_SHARD)),
+                    new ItemStack(Envelope.Items.SOULBOUND_SEAL_STAMP.get())))
+              .save(output, Envelope.resource("soulbound_seal_stamp"));
+
         buildLetterPresettingRecipes(output);
     }
 

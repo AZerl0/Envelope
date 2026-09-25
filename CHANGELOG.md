@@ -1,7 +1,20 @@
 # Changelog
 
 ## UNRELEASED
-Technical Changes
+### Changes and fixes
+Seal
+- Added **Soulbound Seal Stamp**
+  - Obtained by combining any **Seal Stamp** with an **Echo Shard**
+  - Sealing an item with it creates a **Soulbound Seal**, which will prevent the item from dropping when sealer dies, and another players from opening it until the sealer dies
+  - Has 8 uses and will return back to original stamp when depleted
+
+### Technical Changes
+Item components
+- `envelope:seal` definition now has an optional `lock` field 
+
+Misc
+- Added `/envelope seal_lock create|unlock|list` command that can be used to create arbitrary locks for quests, etc.
+  - Created lock also needs to be set in the item's seal to work
 - Moved seal-related textures from `textures/seal` to `textures/gui/sprites/seal` folder to allow for animations with .mcmeta files
 - Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions  
 
@@ -52,7 +65,7 @@ Config
 - Added `delivery.phase_duration_modifier` and `delivery.ascend_distance` options to server config
 - Added `hide_default_seal_stamp_die_outside_of_inventory` option to client config
 
-Item components:
+Item components
 - Added `player_uuid` to the `envelope:seal` item component.
 - `envelope:address` has been replaced with `envelope:address_tag_address`
 - `envelope:mail_recipient` has been replaced with `envelope:mail_address_tag`

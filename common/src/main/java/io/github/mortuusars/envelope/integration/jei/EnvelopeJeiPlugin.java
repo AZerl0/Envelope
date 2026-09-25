@@ -5,23 +5,17 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
-import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingRecipeRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.extensions.*;
 import io.github.mortuusars.envelope.integration.jei.util.LetterMeaningSubtypeInterpreter;
 import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferInfo;
-import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
-import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
-import io.github.mortuusars.envelope.integration.jei.extensions.LetterCloningRecipeExtension;
-import io.github.mortuusars.envelope.integration.jei.extensions.PaybackTagApplicationRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientHelper;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientRenderer;
 import io.github.mortuusars.envelope.integration.jei.util.PaybackTagGhostIngredientHandler;
-import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -170,7 +164,8 @@ public class EnvelopeJeiPlugin implements IModPlugin {
         registration.getCraftingCategory().addExtension(LetterCloningRecipe.class, new LetterCloningRecipeExtension());
         registration.getCraftingCategory().addExtension(AddressTagApplicationRecipe.class, new AddressTagApplicationRecipeExtension());
         registration.getCraftingCategory().addExtension(PaybackTagApplicationRecipe.class, new PaybackTagApplicationRecipeExtension());
-        registration.getCraftingCategory().addExtension(SealStampDyeingRecipe.class, new SealStampDyeingRecipeRecipeExtension());
+        registration.getCraftingCategory().addExtension(SealStampDyeingRecipe.class, new SealStampDyeingRecipeExtension());
+        registration.getCraftingCategory().addExtension(ComponentTransferringRecipe.class, new ComponentTransferringRecipeExtension());
     }
 
     @Override
