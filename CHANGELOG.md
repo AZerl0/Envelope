@@ -15,6 +15,8 @@ Item components
 Misc
 - Added `/envelope seal_lock create|unlock|list` command that can be used to create arbitrary locks for quests, etc.
   - Created lock also needs to be set in the item's seal to work
+- `/envelope send` and `/envelope broadcast` commands have been moved to `/envelope mail send` and `/envelope mail broadcast` respectively
+- `/envelope mail send` now has an additional "recipient" parameter, allowing to specify the target without changing sendable item components (a bit easier to type) 
 - Moved seal-related textures from `textures/seal` to `textures/gui/sprites/seal` folder to allow for animations with .mcmeta files
 - Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions  
 

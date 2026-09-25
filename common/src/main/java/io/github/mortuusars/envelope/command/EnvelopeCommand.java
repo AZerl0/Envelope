@@ -38,20 +38,28 @@ public class EnvelopeCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         dispatcher.register(Commands.literal("envelope")
               .requires((stack) -> stack.hasPermission(2))
-              .then(Commands.literal("send")
-                    .then(Commands.argument("mail", ItemArgument.item(context))
-                          .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
-                          .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+              .then(Commands.literal("mail")
+                    .then(Commands.literal("send")
+                          .then(Commands.argument("mail", ItemArgument.item(context))
                                 .executes(c -> sendMail(c,
-                                      ItemArgument.getItem(c, "mail"),
-                                      parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
-              .then(Commands.literal("broadcast")
-                    .then(Commands.argument("mail", ItemArgument.item(context))
-                          .executes(c -> broadcastMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
-                          .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
-                                .executes(c -> broadcastMail(c,
-                                      ItemArgument.getItem(c, "mail"),
-                                      parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
+                                      ItemArgument.getItem(c, "mail"), Optional.empty(), Optional.empty()))
+                                .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+                                      .executes(c -> sendMail(c,
+                                            ItemArgument.getItem(c, "mail"),
+                                            Optional.of(parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender"))),
+                                            Optional.empty()))
+                                      .then(Commands.argument("recipient", CompoundTagArgument.compoundTag())
+                                            .executes(c -> sendMail(c,
+                                                  ItemArgument.getItem(c, "mail"),
+                                                  Optional.of(parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender"))),
+                                                  Optional.of(parseAddress(c, CompoundTagArgument.getCompoundTag(c, "recipient")))))))))
+                    .then(Commands.literal("broadcast")
+                          .then(Commands.argument("mail", ItemArgument.item(context))
+                                .executes(c -> broadcastMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
+                                .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+                                      .executes(c -> broadcastMail(c,
+                                            ItemArgument.getItem(c, "mail"),
+                                            parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender"))))))))
               .then(Commands.literal("mailbox")
                     .then(Commands.literal("list")
                           .executes(EnvelopeCommand::listAllMailboxes)
@@ -81,11 +89,12 @@ public class EnvelopeCommand {
 
     // -- Mail
 
-    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item, Address sender) throws CommandSyntaxException {
+    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item, Optional<Address> from, Optional<Address> to) throws CommandSyntaxException {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mail = item.createItemStack(1, false);
 
-        Address recipient = Mail.getRecipientOrUnknown(mail);
+
+        Address recipient = to.orElse(Mail.getRecipientOrUnknown(mail));
 
         if (mail.isEmpty()) {
             context.getSource().sendFailure(Component.literal("Cannot send: mail is empty."));
@@ -105,7 +114,7 @@ public class EnvelopeCommand {
         MailService.of(level).getDeliveryManager()
               .startService(Delivery.draft()
                     .deliver(mail)
-                    .from(sender)
+                    .from(from.orElse(Address.UNKNOWN))
                     .to(recipient));
 
         Component message = Component.literal("Mail sent to ").append(recipient.format().asRecipient().toComponent());
